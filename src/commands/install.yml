@@ -1,0 +1,47 @@
+description: Install the CircleCI CLI
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of CircleCI CLI to install, defaults to the latest release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://api.github.com/repos/CircleCI-Public/circleci-cli/tags, e.g.,
+      `v0.1.5581`.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install the CircleCI CLI
+
+  steps:
+    - run:
+        name: Install CircleCI CLI
+        command: |
+          # grab CircleCI CLI version
+          if [[ <<parameters.version>> == "latest" ]]; then
+            # extract latest version from GitHub releases API
+            CIRCLECI_CLI_VERSION=$(curl \
+              --silent --show-error --location --fail --retry 3 \
+              https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/latest | \
+              jq '.tag_name' | sed -E 's/"//g')
+          else
+            CIRCLECI_CLI_VERSION=<<parameters.version>>
+            echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
+          fi
+
+          # check if CircleCI CLI needs to be installed
+          if command -v circleci > /dev/null 2>&1; then
+            if circleci version | grep "${CIRCLECI_CLI_VERSION:1}" > /dev/null 2>&1; then
+              echo "circleci $CIRCLECI_CLI_VERSION is already installed"
+              exit 0
+            else
+              echo "A different version of dockerize is installed ($(dockerize --version)); updating it"
+              circleci update
+              exit 0
+            fi
+          fi
+
+

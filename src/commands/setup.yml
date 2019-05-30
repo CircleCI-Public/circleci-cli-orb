@@ -1,0 +1,27 @@
+description: >
+  Run `circleci setup` to configure the CircleCI CLI (CLI must be
+  installed first):
+  https://circleci-public.github.io/circleci-cli/circleci_setup.html
+
+parameters:
+  host:
+    type: string
+    default: https://circleci.com
+    description: >
+      Full URL of your CircleCI host (use the default value unless you
+      are using a hosted installation of CircleCI)
+
+  token:
+    type: env_var_name
+    default: CIRCLECI_CLI_TOKEN
+    description: >
+      Name of environment variable storing a CircleCI API token to use
+      for CircleCI CLI commands that require authentication
+
+steps:
+  - run:
+      name: Configure CircleCI CLI
+      command: |
+        circleci setup --no-prompt \
+          --host <<parameters.host>> \
+          --token $<<parameters.token>>

@@ -1,0 +1,6 @@
+version: 2.1
+
+orbs:
+  windows: sandbox/windows-tools@dev:preview
+  cli: circleci/circleci-cli@dev:alpha
+
