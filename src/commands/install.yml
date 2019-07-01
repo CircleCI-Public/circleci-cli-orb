@@ -44,7 +44,7 @@ steps:
             echo "circleci $CIRCLECI_CLI_VERSION is already installed"
             exit 0
           else
-            echo "A different version of dockerize is installed ($(dockerize --version)); updating it"
+            echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
             circleci update
             exit 0
           fi
