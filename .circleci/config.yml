@@ -3,3 +3,202 @@ version: 2.1
 orbs:
   cli: circleci/circleci-cli@dev:alpha
 
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+
+    executor: <<parameters.executor>>
+
+    steps:
+      - cli/install
+      - cli/setup
+
+integration-dev_filters: &integration-dev_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /integration-.*/
+
+integration-master_filters: &integration-master_filters
+  branches:
+    ignore: /.*/
+  tags:
+    only: /master-.*/
+
+prod-deploy_requires: &prod-deploy_requires
+  [
+    alpine-master,
+    machine-master,
+    mac-master,
+    docker-master,
+    ci-docker-master,
+    cimg-master,
+    oracle-master
+  ]
+
+workflows:
+  lint_pack-validate_publish-dev:
+    jobs:
+      - orb-tools/lint
+
+      - orb-tools/pack:
+          requires: [orb-tools/lint]
+
+      - orb-tools/publish-dev:
+          orb-name: circleci/circleci-cli
+          context: orb-publishing
+          requires: [orb-tools/pack]
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-dev
+          context: orb-publishing
+          ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
+          requires: [orb-tools/publish-dev]
+          filters:
+            branches:
+              ignore: master
+
+      - orb-tools/trigger-integration-workflow:
+          name: trigger-integration-master
+          context: orb-publishing
+          cleanup-tags: true
+          ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
+          tag: master
+          requires: [orb-tools/publish-dev]
+          filters:
+            branches:
+              only: master
+
+  integration-tests_prod-release:
+    jobs:
+      # triggered by non-master branch commits
+      # alpine
+      - test:
+          name: alpine-dev
+          executor: orb-tools/alpine
+          filters: *integration-dev_filters
+
+      # machine
+      - test:
+          name: machine-dev
+          executor: orb-tools/machine
+          filters: *integration-dev_filters
+
+      # mac
+      - test:
+          name: mac-dev
+          executor: orb-tools/macos
+          filters: *integration-dev_filters
+
+      # docker
+      - test:
+          name: docker-dev
+          executor: orb-tools/node
+          filters: *integration-dev_filters
+
+      # ci-docker
+      - test:
+          name: ci-docker-dev
+          executor:
+            name: orb-tools/node-cci
+            tag: boron-browsers
+          filters: *integration-dev_filters
+
+      # new ci-docker
+      - test:
+          name: cimg-dev
+          executor: orb-tools/ubuntu
+          filters: *integration-dev_filters
+
+      # oracle
+      - test:
+          name: oracle-dev
+          executor: orb-tools/oracle
+          filters: *integration-dev_filters
+
+      # triggered by master branch commits
+      # alpine
+      - test:
+          name: alpine-master
+          executor: orb-tools/alpine
+          filters: *integration-master_filters
+          filters: *integration-master_filters
+
+      # machine
+      - test:
+          name: machine-master
+          executor: orb-tools/machine
+          filters: *integration-master_filters
+
+      # mac
+      - test:
+          name: mac-master
+          executor: orb-tools/macos
+          filters: *integration-master_filters
+
+      # docker
+      - test:
+          name: docker-master
+          executor: orb-tools/node
+          filters: *integration-master_filters
+
+      # ci-docker
+      - test:
+          name: ci-docker-master
+          executor:
+            name: orb-tools/node-cci
+            tag: boron-browsers
+          filters: *integration-master_filters
+
+      # new ci-docker
+      - test:
+          name: cimg-master
+          executor: orb-tools/ubuntu
+          filters: *integration-master_filters
+
+      # oracle
+      - test:
+          name: oracle-master
+          executor: orb-tools/oracle
+          filters: *integration-master_filters
+
+      # patch, minor, or major publishing
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-patch
+          context: orb-publishing
+          orb-name: circleci/circleci-cli
+          ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-patch.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-minor
+          context: orb-publishing
+          orb-name: circleci/circleci-cli
+          ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
+          release: minor
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-minor.*/
+
+      - orb-tools/dev-promote-prod:
+          name: dev-promote-major
+          context: orb-publishing
+          orb-name: circleci/circleci-cli
+          ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
+          release: major
+          requires: *prod-deploy_requires
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /master-major.*/
