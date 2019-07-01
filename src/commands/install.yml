@@ -26,6 +26,8 @@ steps:
   - run:
       name: Install CircleCI CLI
       command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
         # grab CircleCI CLI version
         if [[ "<<parameters.version>>" == "latest" ]]; then
           # extract latest version from GitHub releases API
@@ -45,7 +47,8 @@ steps:
             exit 0
           else
             echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
-            circleci update
-            exit 0
+            $SUDO rm -f "$(which circleci)"
+            curl -fLSs https://circle.ci/cli | $SUDO bash
+            echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
           fi
         fi
