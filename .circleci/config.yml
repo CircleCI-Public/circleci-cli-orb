@@ -124,7 +124,6 @@ workflows:
           name: alpine-master
           executor: orb-tools/alpine
           filters: *integration-master_filters
-          filters: *integration-master_filters
 
       # machine
       - test:
