@@ -80,30 +80,35 @@ workflows:
       # alpine
       - test:
           name: alpine-dev
+          context: orb-publishing
           executor: orb-tools/alpine
           filters: *integration-dev_filters
 
       # machine
       - test:
           name: machine-dev
+          context: orb-publishing
           executor: orb-tools/machine
           filters: *integration-dev_filters
 
       # mac
       - test:
           name: mac-dev
+          context: orb-publishing
           executor: orb-tools/macos
           filters: *integration-dev_filters
 
       # docker
       - test:
           name: docker-dev
+          context: orb-publishing
           executor: orb-tools/node
           filters: *integration-dev_filters
 
       # ci-docker
       - test:
           name: ci-docker-dev
+          context: orb-publishing
           executor:
             name: orb-tools/node-cci
             tag: boron-browsers
@@ -112,12 +117,14 @@ workflows:
       # new ci-docker
       - test:
           name: cimg-dev
+          context: orb-publishing
           executor: orb-tools/ubuntu
           filters: *integration-dev_filters
 
       # oracle
       - test:
           name: oracle-dev
+          context: orb-publishing
           executor: orb-tools/oracle
           filters: *integration-dev_filters
 
@@ -125,30 +132,35 @@ workflows:
       # alpine
       - test:
           name: alpine-master
+          context: orb-publishing
           executor: orb-tools/alpine
           filters: *integration-master_filters
 
       # machine
       - test:
           name: machine-master
+          context: orb-publishing
           executor: orb-tools/machine
           filters: *integration-master_filters
 
       # mac
       - test:
           name: mac-master
+          context: orb-publishing
           executor: orb-tools/macos
           filters: *integration-master_filters
 
       # docker
       - test:
           name: docker-master
+          context: orb-publishing
           executor: orb-tools/node
           filters: *integration-master_filters
 
       # ci-docker
       - test:
           name: ci-docker-master
+          context: orb-publishing
           executor:
             name: orb-tools/node-cci
             tag: boron-browsers
@@ -157,12 +169,14 @@ workflows:
       # new ci-docker
       - test:
           name: cimg-master
+          context: orb-publishing
           executor: orb-tools/ubuntu
           filters: *integration-master_filters
 
       # oracle
       - test:
           name: oracle-master
+          context: orb-publishing
           executor: orb-tools/oracle
           filters: *integration-master_filters
 
