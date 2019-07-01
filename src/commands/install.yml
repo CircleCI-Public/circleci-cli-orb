@@ -16,32 +16,36 @@ parameters:
     description: >
       Directory in which to install the CircleCI CLI
 
-  steps:
-    - run:
-        name: Install CircleCI CLI
-        command: |
-          # grab CircleCI CLI version
-          if [[ <<parameters.version>> == "latest" ]]; then
-            # extract latest version from GitHub releases API
-            CIRCLECI_CLI_VERSION=$(curl \
-              --silent --show-error --location --fail --retry 3 \
-              https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/latest | \
-              jq '.tag_name' | sed -E 's/"//g')
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
+steps:
+  - run:
+      name: Install CircleCI CLI
+      command: |
+        # grab CircleCI CLI version
+        if [[ "<<parameters.version>>" == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          CIRCLECI_CLI_VERSION=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/latest | \
+            jq '.tag_name' | sed -E 's/"//g')
+        else
+          CIRCLECI_CLI_VERSION=<<parameters.version>>
+          echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
+        fi
+
+        # check if CircleCI CLI needs to be installed
+        if command -v circleci<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          if circleci version | grep "${CIRCLECI_CLI_VERSION:1}"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            echo "circleci $CIRCLECI_CLI_VERSION is already installed"
+            exit 0
           else
-            CIRCLECI_CLI_VERSION=<<parameters.version>>
-            echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
+            echo "A different version of dockerize is installed ($(dockerize --version)); updating it"
+            circleci update
+            exit 0
           fi
-
-          # check if CircleCI CLI needs to be installed
-          if command -v circleci > /dev/null 2>&1; then
-            if circleci version | grep "${CIRCLECI_CLI_VERSION:1}" > /dev/null 2>&1; then
-              echo "circleci $CIRCLECI_CLI_VERSION is already installed"
-              exit 0
-            else
-              echo "A different version of dockerize is installed ($(dockerize --version)); updating it"
-              circleci update
-              exit 0
-            fi
-          fi
-
-
+        fi
