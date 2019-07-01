@@ -1,0 +1,54 @@
+description: Install the CircleCI CLI
+
+parameters:
+  version:
+    type: string
+    default: latest
+    description: >
+      Version of CircleCI CLI to install, defaults to the latest release.
+      If specifying a version other than latest, provide a full release tag,
+      as listed at https://api.github.com/repos/CircleCI-Public/circleci-cli/tags, e.g.,
+      `v0.1.5581`.
+
+  install-dir:
+    type: string
+    default: /usr/local/bin
+    description: >
+      Directory in which to install the CircleCI CLI
+
+  debug:
+    type: boolean
+    default: false
+    description: >
+      Extra output for orb developers
+
+steps:
+  - run:
+      name: Install CircleCI CLI
+      command: |
+        if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+
+        # grab CircleCI CLI version
+        if [[ "<<parameters.version>>" == "latest" ]]; then
+          # extract latest version from GitHub releases API
+          CIRCLECI_CLI_VERSION=$(curl \
+            --silent --show-error --location --fail --retry 3 \
+            https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/latest | \
+            jq '.tag_name' | sed -E 's/"//g')
+        else
+          CIRCLECI_CLI_VERSION=<<parameters.version>>
+          echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
+        fi
+
+        # check if CircleCI CLI needs to be installed
+        if command -v circleci<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+          if circleci version | grep "${CIRCLECI_CLI_VERSION:1}"<<^parameters.debug>> > /dev/null 2>&1<</parameters.debug>>; then
+            echo "circleci $CIRCLECI_CLI_VERSION is already installed"
+            exit 0
+          else
+            echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
+            $SUDO rm -f "$(which circleci)"
+            curl -fLSs https://circle.ci/cli | $SUDO bash
+            echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
+          fi
+        fi
