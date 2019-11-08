@@ -4,7 +4,7 @@ Quickly and easily install and configure the [CircleCI command-line interface](h
 
 ## Usage
 
-_For full usage guidelines, see the [orb registry listing](http://circleci.com/orbs/registry/orb/circleci/circleci-cli)._
+_For full usage guidelines, see the [orb registry listing](https://circleci.com/orbs/registry/orb/circleci/circleci-cli)._
 
 ## Examples
 ### executor-command-example
