@@ -48,7 +48,11 @@ steps:
           else
             echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
             $SUDO rm -f "$(which circleci)"
-            curl -fLSs https://circle.ci/cli | $SUDO bash
+            HTTP1_1_OPTION=""
+            if [ -n "$(curl --help | grep '\-\-http1.1')" ]; then
+              HTTP1_1_OPTION="--http1.1"
+            fi
+            curl -fLSs $HTTP1_1_OPTION https://circle.ci/cli | $SUDO bash
             echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
           fi
         fi
