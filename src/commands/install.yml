@@ -52,7 +52,7 @@ steps:
             if [ -n "$(curl --help | grep '\-\-http1.1')" ]; then
               HTTP1_1_OPTION="--http1.1"
             fi
-            curl -fLSs "$HTTP1_1_OPTION" https://circle.ci/cli | $SUDO bash
+            curl -fLSs $HTTP1_1_OPTION https://circle.ci/cli | $SUDO bash
             echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
           fi
         fi
