@@ -2,4 +2,7 @@ version: 2.1
 
 description: >
   Install and configure the CircleCI command-line interface.
-  Repository: https://github.com/CircleCI-Public/circleci-cli-orb
+
+display:
+  home_url: https://circleci-public.github.io/circleci-cli/
+  source_url: https://github.com/CircleCI-Public/circleci-cli-orb

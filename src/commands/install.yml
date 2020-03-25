@@ -31,10 +31,7 @@ steps:
         # grab CircleCI CLI version
         if [[ "<<parameters.version>>" == "latest" ]]; then
           # extract latest version from GitHub releases API
-          CIRCLECI_CLI_VERSION=$(curl \
-            --silent --show-error --location --fail --retry 3 \
-            https://api.github.com/repos/CircleCI-Public/circleci-cli/releases/latest | \
-            jq '.tag_name' | sed -E 's/"//g')
+          CIRCLECI_CLI_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} "https://github.com/CircleCI-Public/circleci-cli/releases/latest" | sed 's:.*/::')
         else
           CIRCLECI_CLI_VERSION=<<parameters.version>>
           echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
