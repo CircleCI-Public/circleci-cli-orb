@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  cli: circleci/circleci-cli@dev:alpha
+  cli: circleci/circleci-cli@d<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@9.0
 
 # Pipeline parameters
@@ -54,11 +54,11 @@ workflows:
 
       - orb-tools/publish-dev:
           orb-name: circleci/circleci-cli
-          context: orb-publishing
+          context: orb-publisher
           requires: *orb_prep_jobs
 
       - orb-tools/trigger-integration-tests-workflow:
-          context: orb-publishing
+          context: orb-publisher
           requires: [orb-tools/publish-dev]
 
   integration-tests_prod-release:
@@ -67,31 +67,31 @@ workflows:
       # alpine
       - test:
           name: alpine
-          context: orb-publishing
+          context: orb-publisher
           executor: orb-tools/alpine
 
       # machine
       - test:
           name: machine
-          context: orb-publishing
+          context:orb-publisher
           executor: orb-tools/machine
 
       # mac
       - test:
           name: mac
-          context: orb-publishing
+          context: orb-publisher
           executor: orb-tools/macos
 
       # docker
       - test:
           name: docker
-          context: orb-publishing
+          context: orb-publisher
           executor: orb-tools/node
 
       # ci-docker
       - test:
           name: ci-docker
-          context: orb-publishing
+          context: orb-publisher
           executor:
             name: orb-tools/node-cci
             tag: boron-browsers
@@ -99,21 +99,21 @@ workflows:
       # new ci-docker
       - test:
           name: cimg
-          context: orb-publishing
+          context: orb-publisher
           executor: orb-tools/ubuntu
 
       # oracle
       - test:
           name: oracle
-          context: orb-publishing
+          context: orb-publisher
           executor: orb-tools/oracle
 
       - orb-tools/dev-promote-prod-from-commit-subject:
-          context: orb-publishing
+          context: orb-publisher
           orb-name: circleci/circleci-cli
           add-pr-comment: true
           bot-token-variable: GHI_TOKEN
-          bot-user: cpe-bot
+          bot-user: orb-publisher
           fail-if-semver-not-indicated: true
           publish-version-tag: true
           ssh-fingerprints: 72:af:5d:cd:d3:4c:52:5d:6c:c6:5c:69:87:42:df:37
