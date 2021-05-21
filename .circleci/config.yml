@@ -67,31 +67,31 @@ workflows:
       # alpine
       - test:
           name: alpine
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/alpine
 
       # machine
       - test:
           name: machine
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/machine
 
       # mac
       - test:
           name: mac
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/macos
 
       # docker
       - test:
           name: docker
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/node
 
       # ci-docker
       - test:
           name: ci-docker
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor:
             name: orb-tools/node-cci
             tag: boron-browsers
@@ -99,13 +99,13 @@ workflows:
       # new ci-docker
       - test:
           name: cimg
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/ubuntu
 
       # oracle
       - test:
           name: oracle
-          context: orb-publisher
+          context: circleci-cli-orb-testing
           executor: orb-tools/oracle
 
       - orb-tools/dev-promote-prod-from-commit-subject:
