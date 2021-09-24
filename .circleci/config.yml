@@ -52,7 +52,6 @@ prod-deploy_requires: &prod-deploy_requires
     base,
     machine,
     mac,
-    cimg,
     openjdk
   ]
 
