@@ -2,7 +2,7 @@ version: 2.1
 
 orbs:
   cli: circleci/circleci-cli@<<pipeline.parameters.dev-orb-version>>
-  orb-tools: circleci/orb-tools@9.0
+  orb-tools: circleci/orb-tools@10.0.5
 
 # Pipeline parameters
 parameters:
@@ -14,6 +14,20 @@ parameters:
   dev-orb-version:
     type: string
     default: "dev:alpha"
+
+executors:
+  macos:
+    macos:
+      xcode: 12.5.1
+  base:
+    docker:
+      - image: cimg/base:stable
+  openjdk:
+    docker:
+      - image: cimg/openjdk:16.0.2
+  machine:
+    machine:
+      image: ubuntu-2004:202107-02
 
 jobs:
   test:
@@ -35,13 +49,10 @@ orb_prep_jobs: &orb_prep_jobs
 
 prod-deploy_requires: &prod-deploy_requires
   [
-    alpine,
+    base,
     machine,
     mac,
-    docker,
-    ci-docker,
-    cimg,
-    oracle
+    openjdk
   ]
 
 workflows:
@@ -64,49 +75,29 @@ workflows:
   integration-tests_prod-release:
     when: << pipeline.parameters.run-integration-tests >>
     jobs:
-      # alpine
+      # base
       - test:
-          name: alpine
+          name: base
           context: circleci-cli-orb-testing
-          executor: orb-tools/alpine
+          executor: base
 
       # machine
       - test:
           name: machine
           context: circleci-cli-orb-testing
-          executor: orb-tools/machine
+          executor: machine
 
       # mac
       - test:
           name: mac
           context: circleci-cli-orb-testing
-          executor: orb-tools/macos
+          executor: macos
 
-      # docker
+      # openjdk
       - test:
-          name: docker
+          name: openjdk
           context: circleci-cli-orb-testing
-          executor: orb-tools/node
-
-      # ci-docker
-      - test:
-          name: ci-docker
-          context: circleci-cli-orb-testing
-          executor:
-            name: orb-tools/node-cci
-            tag: boron-browsers
-
-      # new ci-docker
-      - test:
-          name: cimg
-          context: circleci-cli-orb-testing
-          executor: orb-tools/ubuntu
-
-      # oracle
-      - test:
-          name: oracle
-          context: circleci-cli-orb-testing
-          executor: orb-tools/oracle
+          executor: openjdk
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           context: orb-publisher
