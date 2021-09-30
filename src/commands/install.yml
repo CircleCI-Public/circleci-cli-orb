@@ -45,9 +45,7 @@ steps:
           else
             echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
             $SUDO rm -f "$(which circleci)"
-            curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh > install_cli.sh
-            chmod +x ./install_cli.sh
-            $SUDO ./install_cli.sh
+            curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh | $SUDO bash
             echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
           fi
         fi
