@@ -22,9 +22,9 @@ executors:
   base:
     docker:
       - image: cimg/base:stable
-  openjdk:
+  alpine:
     docker:
-      - image: cimg/openjdk:16.0.2
+      - image: cibuilds/base
   machine:
     machine:
       image: ubuntu-2004:202107-02
@@ -52,7 +52,7 @@ prod-deploy_requires: &prod-deploy_requires
     base,
     machine,
     mac,
-    openjdk
+    alpine
   ]
 
 workflows:
@@ -93,11 +93,11 @@ workflows:
           context: circleci-cli-orb-testing
           executor: macos
 
-      # openjdk
+      # alpine
       - test:
-          name: openjdk
+          name: alpine
           context: circleci-cli-orb-testing
-          executor: openjdk
+          executor: alpine
 
       - orb-tools/dev-promote-prod-from-commit-subject:
           context: orb-publisher
