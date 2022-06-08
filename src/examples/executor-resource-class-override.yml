@@ -1,0 +1,15 @@
+description: Override the default resource_class for the executor
+
+usage:
+  version: 2.1
+
+  orbs:
+    cli: circleci/circleci-cli@x.y.z
+
+  jobs:
+    use-executor:
+      executor:
+        name: cli/default
+        resource_class: medium
+      steps:
+        - run: echo "this job is using the orb's default executor"
