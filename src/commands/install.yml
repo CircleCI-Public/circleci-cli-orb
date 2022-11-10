@@ -25,15 +25,18 @@ parameters:
 steps:
   - run:
       name: Install CircleCI CLI
+      environment:
+        ORB_VAL_VERSION: << parameters.version >>
+        ORB_VAL_DEBUG: << parameters.debug >>
       command: |
         if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 
         # grab CircleCI CLI version
-        if [[ "<<parameters.version>>" == "latest" ]]; then
+        if [[ "${ORB_VAL_VERSION}" == "latest" ]]; then
           # extract latest version from GitHub releases API
           CIRCLECI_CLI_VERSION=$(curl -Ls -o /dev/null -w %{url_effective} "https://github.com/CircleCI-Public/circleci-cli/releases/latest" | sed 's:.*/::')
         else
-          CIRCLECI_CLI_VERSION=<<parameters.version>>
+          CIRCLECI_CLI_VERSION="${ORB_VAL_VERSION}"
           echo "Selected version of CircleCI CLI is $CIRCLECI_CLI_VERSION"
         fi
 
