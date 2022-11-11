@@ -12,14 +12,20 @@ jobs:
         type: executor
     executor: <<parameters.executor>>
     steps:
-      - cli/install
-      - cli/setup
+      - circleci-cli/install
+      - circleci-cli/setup
 workflows:
   test-deploy:
     jobs:
       # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
-      - command-tests:
+      - test:
+          name: << matrix.executor >>
+          context: circleci-cli-orb-testing
           filters: *filters
+          matrix: 
+            alias: test-executors
+            parameters: 
+              executor: [ "base", "macos", "alpine", "machine"]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -28,7 +34,7 @@ workflows:
           pub-type: production
           requires:
             - orb-tools/pack
-            - command-tests
+            - test-executors
           context: orb-publisher
           filters:
             branches:

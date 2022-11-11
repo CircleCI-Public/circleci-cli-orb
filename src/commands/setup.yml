@@ -21,7 +21,7 @@ parameters:
 steps:
   - run:
       name: Configure CircleCI CLI
-      command: |
-        circleci setup --no-prompt \
-          --host <<parameters.host>> \
-          --token $<<parameters.token>>
+      environment:
+        ORB_EVAL_HOST: <<parameters.host>>
+        ORB_ENV_CLI_TOKEN: <<parameters.token>>
+      command: <<include(scripts/setup.sh)>>
