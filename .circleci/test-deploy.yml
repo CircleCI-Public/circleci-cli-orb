@@ -36,6 +36,8 @@ workflows:
             - orb-tools/pack
             - test-executors
           context: orb-publisher
+          enable-pr-comment: true
+          github-token: GHI_TOKEN          
           filters:
             branches:
               ignore: /.*/

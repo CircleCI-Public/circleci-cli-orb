@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-  This orb enables users to easily install and configure the CircleCI command-line interface.
+  Install and configure the CircleCI command-line interface.
 
 display:
   home_url: https://circleci-public.github.io/circleci-cli/
