@@ -1,0 +1,58 @@
+version: 2.1
+orbs:
+  circleci-cli: circleci/circleci-cli@dev:<<pipeline.git.revision>>
+  orb-tools: circleci/orb-tools@11.5
+filters: &filters
+  tags:
+    only: /.*/
+jobs:
+  test:
+    parameters:
+      executor:
+        type: executor
+    executor: <<parameters.executor>>
+    steps:
+      - circleci-cli/install
+      - circleci-cli/setup
+workflows:
+  test-deploy:
+    jobs:
+      # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      - test:
+          name: << matrix.executor >>
+          context: circleci-cli-orb-testing
+          filters: *filters
+          matrix: 
+            alias: test-executors
+            parameters: 
+              executor: [ "base", "macos", "alpine", "machine"]
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: circleci/circleci-cli
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires:
+            - orb-tools/pack
+            - test-executors
+          context: orb-publisher
+          enable-pr-comment: true
+          github-token: GHI_TOKEN          
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
+executors:
+  macos:
+    macos:
+      xcode: 12.5.1
+  base:
+    docker:
+      - image: cimg/base:stable
+  alpine:
+    docker:
+      - image: cibuilds/base
+  machine:
+    machine:
+      image: ubuntu-2004:202107-02
