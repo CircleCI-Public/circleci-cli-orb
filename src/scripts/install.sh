@@ -26,7 +26,7 @@ if command -v circleci > "$OUTPUT" 2>&1; then
     else
         echo "A different version of the CircleCI CLI is installed ($(circleci version)); updating it"
         $SUDO rm -f "$(which circleci)"
-        curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/master/install.sh | $SUDO VERSION="$VERSION" bash
+        curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/main/install.sh | $SUDO VERSION="$VERSION" bash
         echo "CircleCI CLI version $(circleci --skip-update-check version) has been installed to $(which circleci)"
     fi
 fi
