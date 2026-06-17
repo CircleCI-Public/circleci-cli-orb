@@ -25,7 +25,7 @@ workflows:
           matrix: 
             alias: test-executors
             parameters: 
-              executor: [ "base", "macos", "alpine", "machine"]
+              executor: [ "base", "macos", "machine"]
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -46,13 +46,10 @@ workflows:
 executors:
   macos:
     macos:
-      xcode: 12.5.1
+      xcode: 26.6.0
   base:
     docker:
-      - image: cimg/base:stable
-  alpine:
-    docker:
-      - image: cibuilds/base
+      - image: cimg/base:current
   machine:
     machine:
-      image: ubuntu-2004:202107-02
+      image: ubuntu-2604:current
